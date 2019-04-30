@@ -12,6 +12,8 @@
         <meta charset="UTF-8">
         <title>留言板</title>
         <link rel="stylesheet" href="${pageScope.basePath}/css/index.css">
+        <link rel="stylesheet" href="${pageScope.basePath}/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${pageScope.basePath}/css/add.css">
         <script type="text/javascript">
             function submitMessageForm(flag) {
                 if ('first' == flag) {
@@ -64,7 +66,7 @@
         </section>
         <section class="main">
             <div class="container">
-                <c:forEach items="${messages}" var="msg">
+                <c:forEach items="${personalMessages}" var="msg">
                     <div class="alt-item">
                         <div class="alt-head">
                             <div class="alt-info">
@@ -75,7 +77,14 @@
                         <div class="alt-content">
                             <h3>${msg.title}</h3>
                             <p>${msg.content}</p>
+                            <div id="editMessage" class="col-sm-offset-2 col-sm-10">
+                                <a href="${pageScope.basePath}/editMessagePrompt.do"><button class="btn btn-primary">修改</button></a>
+                            </div>
+                            <div id="deleteMessage" class="col-sm-offset-2 col-sm-10">
+                                <a href="${pageScope.basePath}/deleteMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">删除</button></a>
+                            </div>
                         </div>
+
                     </div>
                 </c:forEach>
             </div>
@@ -95,7 +104,7 @@
 
                 <div id="pagefy">
                     <ul>
-                        <form id="messageForm" action="${pageScope.basePath}/message/list.do" method="post">
+                        <form id="messageForm" action="${pageScope.basePath}/my/message/list.do" method="post">
                             <input type="hidden" id="page" name="page" value="${page}">
                             <input type="hidden" id="last" name="last" value="${last}">
                             <li><a href="javascript:void(0)" onclick="submitMessageForm('first')">首页</a></li>

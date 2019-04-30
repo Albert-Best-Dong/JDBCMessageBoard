@@ -1,6 +1,7 @@
 package com.imooc.jdbc.servlet;
 
 import com.imooc.jdbc.bean.Message;
+import com.imooc.jdbc.bean.User;
 import com.imooc.jdbc.service.MessageService;
 
 import javax.servlet.ServletException;
@@ -10,13 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 消息列表Servlet
  *
  * @version 1.0
  */
-@WebServlet("/my/message/list.do")
+@WebServlet(urlPatterns = {"/my/message/list.do","/deleteMessagePrompt.do"})
 public class PersonalMessageListServlet extends HttpServlet {
 
     private MessageService messageService;
@@ -29,6 +31,11 @@ public class PersonalMessageListServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String pathName = request.getServletPath();
+        if (Objects.equals("/deleteMessagePrompt.do", pathName)) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            messageService.deleteMessage(id);
+        }
         String pageStr = request.getParameter("page");//当前页码
         int page = 1;//页码默认值为1
         if (null != pageStr && (!"".equals(pageStr))) {
@@ -38,14 +45,14 @@ public class PersonalMessageListServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
-
-        List<Message> messages = messageService.getMessages(page, 5);//分页查询全部留言
-        int count = messageService.countMessages();
+        User user = (User)request.getSession().getAttribute("user");
+        List<Message> personalMessages = messageService.getMessagesByUser(page, 5,user.getName());//分页查询登录用户全部留言
+        int count = messageService.countUserMessage(user.getName());
         int last = count % 5 == 0 ? (count / 5) : ((count / 5) + 1);
         request.setAttribute("last", last);
-        request.setAttribute("messages", messages);
+        request.setAttribute("personalMessages", personalMessages);
         request.setAttribute("page", page);
-        request.getRequestDispatcher("/WEB-INF/views/biz/message_list.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/biz/user_message_list.jsp").forward(request, response);
     }
 
     @Override

@@ -41,5 +41,25 @@ public class MessageService {
     public int countMessages() {
         return messageDAO.countMessages();
     }
+    /**
+    *   查询当前用户的留言
+    *   @author albert
+    *   @date 2019/4/30
+    *
+    */
+    public List<Message> getMessagesByUser(int page, int pageSize, String name) {
+        return messageDAO.getMessageByUser(page, pageSize, name);
+    }
 
+    /**
+     * 计算当前用户所有留言数量
+     * @return
+     */
+    public int countUserMessage(String name) {
+        return messageDAO.countUserMessage(name);
+    }
+
+    public void deleteMessage(int id) {
+        messageDAO.deleteMessage(id);
+    }
 }

@@ -100,5 +100,80 @@ public class MessageDAO {
        }
        return 0;
    }
+    /**
+     *   查询当前用户的留言
+     *   @author albert
+     *   @date 2019/4/30
+     *
+     */
+   public List<Message> getMessageByUser(int page, int pageSize, String name) {
+       Connection conn = ConnectionUtil.getConnection();
+       String sql = "select * from message where username = ? order by create_time desc limit ?, ?";//limit m, n：从第m条开始，取出总共n条记录
+       PreparedStatement stmt = null;
+       ResultSet rs = null;
+       List<Message> messages = new ArrayList<>();
+       try {
+           stmt = conn.prepareStatement(sql);
+           stmt.setString(1,name);
+           stmt.setInt(2, (page - 1) * pageSize);
+           stmt.setInt(3, pageSize);
 
+           rs = stmt.executeQuery();
+           while (rs.next()) {
+               messages.add(new Message(rs.getLong("id"),
+                       rs.getLong("user_id"),
+                       rs.getString("username"),
+                       rs.getString("title"),
+                       rs.getString("content"),
+                       rs.getTimestamp("create_time")));
+           }
+       } catch (SQLException e) {
+           e.printStackTrace();
+       } finally {
+           ConnectionUtil.release(rs, stmt, conn);
+       }
+        return messages;
+    }
+
+    /**
+     * 计算当前用户所有留言数量
+     * @return
+     */
+    public int countUserMessage(String name) {
+        Connection conn = ConnectionUtil.getConnection();
+        String sql = "select count(*) total from message where username = ?";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1,name);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionUtil.release(rs, stmt, conn);
+        }
+        return 0;
+    }
+
+    public void deleteMessage(int id) {
+        Connection conn = ConnectionUtil.getConnection();
+        String sql = "delete from message where id = ?";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1,id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionUtil.release(rs, stmt, conn);
+        }
+
+    }
 }

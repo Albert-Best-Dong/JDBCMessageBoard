@@ -117,16 +117,14 @@ public class UserDAO {
 
     public void regist(User user) {
         Connection conn = ConnectionUtil.getConnection();
-        String sql = "INSERT user SET id = DEFAULT,username = ?, password = ?, real_name = ?, birthday = ?, phone = ?, address = ?";
+        String sql = "INSERT user SET id = DEFAULT,username = ?, password = ?";
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getPassword());
-            stmt.setString(3, user.getRealName());
-            stmt.setDate(4, new Date(user.getBirthday().getTime()));
-            stmt.setString(5, user.getPhone());
-            stmt.setString(6, user.getAddress());
+
+
 //            stmt.setLong(7, user.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {

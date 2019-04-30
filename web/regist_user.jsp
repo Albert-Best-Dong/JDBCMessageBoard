@@ -6,129 +6,100 @@
     pageContext.setAttribute("basePath", basePath);
 %>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>注册</title>
-        <link rel="stylesheet" href="${pageScope.basePath}/css/bootstrap.min.css">
-        <link rel="stylesheet" href="${pageScope.basePath}/css/add.css">
-        <script type="text/javascript" src="${pageScope.basePath}/js/jquery-3.3.1.js"></script>
-    </head>
-    <body>
-        <nav class="navbar navbar-default">
-            <div class="container">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#">
-                        慕课网留言板个人信息
-                    </a>
-                </div>
-            </div>
-        </nav>
-        <div class="container">
-            <div class="jumbotron">
-<%--                <h1>Hello, ${user.name}!</h1>--%>
-<%--                <p>请斟酌后修改 ^_^</p>--%>
-            </div>
-            <div class="page-header">
-                <h3><small>个人信息</small></h3>
-            </div>
-            <form class="form-horizontal" action="${pageScope.basePath}/registUser.do" method="post">
-                <input id="id" name="id" type="hidden" value="${user.id}">
-                <div class="form-group">
-                    <label for="name" class="col-sm-2 control-label">用户 ：</label>
-                    <div class="col-sm-6">
-                        <input name="name" class="form-control" id="name">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="password" class="col-sm-2 control-label">密码 ：</label>
-                    <div class="col-sm-6">
-                        <input name="password" type="password" class="form-control" id="password" >
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="checkPassword" class="col-sm-2 control-label">确认密码 ：</label>
-                    <div class="col-sm-6">
-                        <input name="checkPassword" type="password" class="form-control" id="checkPassword">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="realName" class="col-sm-2 control-label">姓名 ：</label>
-                    <div class="col-sm-8">
-                        <input name="realName" class="form-control" id="realName">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="birthday" class="col-sm-2 control-label">生日 ：</label>
-                    <div class="col-sm-8">
-                        <input name="birthday" class="form-control" id="birthday">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="phone" class="col-sm-2 control-label">电话 ：</label>
-                    <div class="col-sm-8">
-                        <input name="phone"  class="form-control" id="phone">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="address" class="col-sm-2 control-label">地址 ：</label>
-                    <div class="col-sm-8">
-                        <input name="address"  class="form-control" id="address">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <td>验证码</td>
-                        <td style="border-right-style:none;">
-                            <input type="text" name="checkCode" placeholder="请输入验证码" id="inputCode">
-
-                        </td>
-                        <td style="border-left-style:none;">
-                            <img src="${pageScope.basePath}kaptcha.jpg" id="checkCode"/>
-
-                        </td>
-                        <button type="submit" class="btn btn-primary">注册</button>&nbsp;&nbsp;&nbsp;
-                        <button type="reset" class="btn btn-primary">重置</button>&nbsp;
-                    </div>
-                </div>
-            </form>
-        </div>
-        <footer class="text-center" >
-            copy@imooc
-        </footer>
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="stylesheet" href="${pageScope.basePath}/css/login.css">
+    <script type="text/javascript" src="${pageScope.basePath}/js/jquery-3.3.1.js"></script>
     <script type="text/javascript">
-        $("#checkCode").on("click", function () {
-            $(this).attr("src", "kaptcha.jpg?d=" + new Date().getTime());
-        });
-        var pwd = null;
-        var checkpwd = null;
-        $("input[type='submit']").click(function () {
-            var code = $("input[name='checkCode']").val();
-            var username = $("input[name='username']").val();
-            var password = $("input[name='password']").val();
-            $.ajax({
-                "url": "mook_course/login",
-                "data": {"code": code, "username": username, "password": password},
-                "type": "post",
-                "dataType": "json",
-                "success": function (data) {
-                    if(data.success!=null){
-                        console.log(data);
-                        window.location.replace("http://localhost:8080/mook_course/pages/admin/server.jsp");
-                    }else if(data.fail!=null){
-                        alert("信息有误");
-                        window.location.replace("http://localhost:8080/mook_course/");
-                    }
+        function changeImg() {
+            var img = document.getElementById("img");
+            img.src = "http://localhost:8080/JDBCMessageBoard/verificationCode.do?date=" + new Date();
+        }
 
+        function checkVerificationCode() {
+            var verificationCode = document.getElementById('verificationCode').value;
+            var flag = (getCookie('v_c_v') == verificationCode);
+            if (!flag) {
+                alert('验证码输入错误');
+            }
 
-                },
-                "error": function (err) {
-                    alert("信息有误");
-                    window.location.replace("http://localhost:8080/mook_course/");
-                    console.log(err);
+            return flag;
+        }
 
+        function getCookie(cookie_name) {
+            var allCookies = document.cookie;
+            var cookie_pos = allCookies.indexOf(cookie_name);   //如果找到了索引，就代表cookie存在
+            if (cookie_pos != -1) {
+                cookie_pos += cookie_name.length + 1;
+                var cookie_end = allCookies.indexOf(";", cookie_pos);
+                if (cookie_end == -1) {
+                    cookie_end = allCookies.length;
                 }
-            });
-        })
+                return unescape(allCookies.substring(cookie_pos, cookie_end));
+            }
+            return null;
+        }
     </script>
-    </body>
+</head>
+<body>
+<div class="login">
+    <div class="header">
+        <h1>
+            <a href="${pageScope.basePath}/login.do">登录</a>
+            <a href="${pageScope.basePath}/regPrompt.do">注册</a>
+        </h1>
+        <button></button>
+    </div>
+    <form action="${pageScope.basePath}/registUser.do" method="post">
+        <div class="name">
+            <input type="text" id="name" name="name" required="required" placeholder="请输入登录用户名">
+            <p></p>
+        </div>
+        <div class="pwd">
+            <input type="password" id="password" name="password" required="required" placeholder="6-16位密码，区分大小写，不能用空格">
+            <p></p>
+        </div>
+        <div class="pwd">
+            <input type="password" id="checkPassword" id="checkPassword" required="required" name="checkPassword" placeholder="确认密码">
+            <p></p>
+        </div>
+        <div class="code">
+            <input type="text" id="verificationCode" placeholder="请输入验证码">
+            <a href='#' onclick="javascript:changeImg()">&nbsp;&nbsp;&nbsp;&nbsp;换一张</a>
+            <span><img id="img" src="http://localhost:8080/JDBCMessageBoard/verificationCode.do"/></span>
+            <div class="clear"></div>
+        </div>
+        <div class="autoLogin">
+            <label for="">
+                <input type="checkbox" checked="checked">
+                下次自动登录
+            </label>
+            <a href="">忘记密码</a>
+        </div>
+        <div class="btn-red">
+            <input onclick="return checkVerificationCode();" type="submit" value="注册" id="login-btn">
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+    var pwd = null;
+    var checkPwd = null;
+    $("#password").blur(function () {
+        pwd = $("#password").val();
+    });
+
+    $("#checkPassword").blur(function () {
+        checkPwd = $("#checkPassword").val();
+        if (pwd != checkPwd) {
+            alert("两次密码不一样！");
+            $("#password").val("");
+            $("#checkPassword").val("");
+        }
+    });
+
+</script>
+</body>
 </html>

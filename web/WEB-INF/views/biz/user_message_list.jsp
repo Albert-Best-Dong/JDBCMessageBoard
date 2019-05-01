@@ -59,7 +59,7 @@
         <section class="banner">
             <div class="container">
                 <div>
-                    <h1>慕课网留言板</h1>
+                    <h1>慕课网留言板---我的留言</h1>
                     <p>慕课网是垂直的互联网IT技能免费学习网站。以独家视频教程、在线编程工具、学习计划、问答社区为核心特色。在这里，你可以找到最好的互联网技术牛人，也可以通过免费的在线公开视频课程学习国内领先的互联网IT技术。 </p>
                 </div>
             </div>
@@ -67,6 +67,7 @@
         <section class="main">
             <div class="container">
                 <c:forEach items="${personalMessages}" var="msg">
+
                     <div class="alt-item">
                         <div class="alt-head">
                             <div class="alt-info">
@@ -78,7 +79,7 @@
                             <h3>${msg.title}</h3>
                             <p>${msg.content}</p>
                             <div id="editMessage" class="col-sm-offset-2 col-sm-10">
-                                <a href="${pageScope.basePath}/editMessagePrompt.do"><button class="btn btn-primary">修改</button></a>
+                                <a href="${pageScope.basePath}/editMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">修改</button></a>
                             </div>
                             <div id="deleteMessage" class="col-sm-offset-2 col-sm-10">
                                 <a href="${pageScope.basePath}/deleteMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">删除</button></a>
@@ -120,5 +121,6 @@
         <footer>
             copy@慕课网
         </footer>
+
     </body>
 </html>

@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +21,7 @@ import java.util.Objects;
  *
  * @version 1.0
  */
-@WebServlet(urlPatterns = {"/my/message/list.do","/deleteMessagePrompt.do"})
+@WebServlet(urlPatterns = {"/my/message/list.do", "/deleteMessagePrompt.do", "/editMessagePrompt.do","/editMessage.do"})
 public class PersonalMessageListServlet extends HttpServlet {
 
     private MessageService messageService;
@@ -30,11 +33,41 @@ public class PersonalMessageListServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathName = request.getServletPath();
         if (Objects.equals("/deleteMessagePrompt.do", pathName)) {
-            int id = Integer.parseInt(request.getParameter("id"));
+            String tempId = request.getParameter("id");
+            long id = Long.parseLong(tempId);
             messageService.deleteMessage(id);
+        } else if (Objects.equals("/editMessagePrompt.do", pathName)) {
+            String tempId = request.getParameter("id");
+            long id = Long.parseLong(tempId);
+            Message message = messageService.getMessageById(id);
+            request.setAttribute("editMessage", message);
+            request.getRequestDispatcher("/WEB-INF/views/biz/edit_message.jsp").forward(request, response);
+            return;
+        } else if (Objects.equals("/editMessage.do", pathName)) {
+            Long id = Long.valueOf(request.getParameter("id"));
+            String title = request.getParameter("title");
+            String content = request.getParameter("content");
+            Date createTime = null;
+            try {
+                createTime = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("createTime"));
+            } catch (ParseException e) {
+                System.out.println("格式化Birthday字段失败");
+                e.printStackTrace();
+            }
+            User user = (User) request.getSession().getAttribute("user");
+
+            Message message = new Message(id, user.getId(), user.getName(), title, content, createTime);
+            boolean result = messageService.UpdateMessage(message);
+            if (result) {
+                request.getRequestDispatcher("/my/message/list.do").forward(request,response);
+                return;
+            }else{
+                request.getRequestDispatcher("/WEB-INF/views/biz/404.jsp").forward(request, response);
+                return;
+            }
         }
         String pageStr = request.getParameter("page");//当前页码
         int page = 1;//页码默认值为1
@@ -45,14 +78,19 @@ public class PersonalMessageListServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
-        User user = (User)request.getSession().getAttribute("user");
-        List<Message> personalMessages = messageService.getMessagesByUser(page, 5,user.getName());//分页查询登录用户全部留言
+        User user = (User) request.getSession().getAttribute("user");
+        List<Message> personalMessages = messageService.getMessagesByUser(page, 5, user.getName());//分页查询登录用户全部留言
         int count = messageService.countUserMessage(user.getName());
         int last = count % 5 == 0 ? (count / 5) : ((count / 5) + 1);
         request.setAttribute("last", last);
         request.setAttribute("personalMessages", personalMessages);
         request.setAttribute("page", page);
         request.getRequestDispatcher("/WEB-INF/views/biz/user_message_list.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
     }
 
     @Override

@@ -59,7 +59,15 @@ public class MessageService {
         return messageDAO.countUserMessage(name);
     }
 
-    public void deleteMessage(int id) {
+    public void deleteMessage(long id) {
         messageDAO.deleteMessage(id);
+    }
+
+    public Message getMessageById(long id) {
+        return messageDAO.getMessageById(id);
+    }
+
+    public boolean UpdateMessage(Message message) {
+        return messageDAO.updateMessage(message);
     }
 }

@@ -3,11 +3,7 @@ package com.imooc.jdbc.dao;
 import com.imooc.jdbc.bean.Message;
 import com.imooc.jdbc.common.ConnectionUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,14 +155,14 @@ public class MessageDAO {
         return 0;
     }
 
-    public void deleteMessage(int id) {
+    public void deleteMessage(long id) {
         Connection conn = ConnectionUtil.getConnection();
         String sql = "delete from message where id = ?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1,id);
+            stmt.setLong(1,id);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -175,5 +171,58 @@ public class MessageDAO {
             ConnectionUtil.release(rs, stmt, conn);
         }
 
+    }
+
+    public Message getMessageById(long id) {
+        Connection conn = ConnectionUtil.getConnection();
+        String sql = "select * from message where id = ?";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Message message = null;
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setLong(1,id);
+
+
+            rs = stmt.executeQuery();
+            if(rs.next()) {
+
+               message = new Message(rs.getLong("id"),
+                        rs.getLong("user_id"),
+                        rs.getString("username"),
+                        rs.getString("title"),
+                        rs.getString("content"),
+                        rs.getTimestamp("create_time"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            ConnectionUtil.release(rs, stmt, conn);
+        }
+        return message;
+    }
+
+    public boolean updateMessage(Message message) {
+        Connection conn = ConnectionUtil.getConnection();
+        String sql = "UPDATE message SET user_id = ?, username = ?, title = ?, content = ?, create_time = ? WHERE id = ?";
+        PreparedStatement stmt = null;
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setLong(1, message.getUserId());
+            stmt.setString(2, message.getUsername());
+            stmt.setString(3, message.getTitle());
+            stmt.setString(4, message.getContent());
+            stmt.setDate(5, new Date(message.getCreateTime().getTime()));
+
+            stmt.setLong(6, message.getId());
+            stmt.execute();
+        } catch (SQLException e) {
+            System.out.println("留言更新失败。");
+            e.printStackTrace();
+            return false;
+        } finally {
+            ConnectionUtil.release(null, stmt, conn);
+        }
+        return true;
     }
 }

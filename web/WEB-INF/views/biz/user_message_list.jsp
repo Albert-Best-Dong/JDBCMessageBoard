@@ -13,7 +13,6 @@
         <title>留言板</title>
         <link rel="stylesheet" href="${pageScope.basePath}/css/index.css">
         <link rel="stylesheet" href="${pageScope.basePath}/css/bootstrap.min.css">
-        <link rel="stylesheet" href="${pageScope.basePath}/css/add.css">
         <script type="text/javascript">
             function submitMessageForm(flag) {
                 if ('first' == flag) {
@@ -78,16 +77,20 @@
                         <div class="alt-content">
                             <h3>${msg.title}</h3>
                             <p>${msg.content}</p>
-                            <div id="editMessage" class="col-sm-offset-2 col-sm-10">
-                                <a href="${pageScope.basePath}/editMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">修改</button></a>
+                            <div style="overflow: hidden">
+                                <div id="editMessage" class="ed-sub" style="display: inline;float: right">
+                                    <a href="${pageScope.basePath}/editMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">修改</button></a>
+                                </div>
+                                <div id="deleteMessage" class="ed-sub" style="display: inline;float: right">
+                                    <a href="${pageScope.basePath}/deleteMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">删除</button></a>
+                                </div>
                             </div>
-                            <div id="deleteMessage" class="col-sm-offset-2 col-sm-10">
-                                <a href="${pageScope.basePath}/deleteMessagePrompt.do?id=${msg.id}"><button class="btn btn-primary">删除</button></a>
-                            </div>
+
                         </div>
 
                     </div>
                 </c:forEach>
+
             </div>
         </section>
         <section class="page">
@@ -121,6 +124,15 @@
         <footer>
             copy@慕课网
         </footer>
+    <script type="text/javascript">
+        var deleteResult = ${deleteResult}
 
+        if(deleteResult == true){
+            alert("删除成功");
+        }else{
+            alert("删除失败");
+        }
+
+    </script>
     </body>
 </html>

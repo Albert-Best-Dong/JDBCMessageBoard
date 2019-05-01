@@ -35,10 +35,20 @@ public class PersonalMessageListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathName = request.getServletPath();
+        boolean result ;
         if (Objects.equals("/deleteMessagePrompt.do", pathName)) {
             String tempId = request.getParameter("id");
             long id = Long.parseLong(tempId);
-            messageService.deleteMessage(id);
+            result = messageService.deleteMessage(id);
+            if (result) {
+                request.setAttribute("deleteResult", true);
+                request.getRequestDispatcher("/my/message/list.do").forward(request, response);  //删除成功
+                return;
+            } else {
+                request.setAttribute("deleteResult", true);
+                request.getRequestDispatcher("/my/message/list.do").forward(request, response);  //删除失败
+                return;
+            }
         } else if (Objects.equals("/editMessagePrompt.do", pathName)) {
             String tempId = request.getParameter("id");
             long id = Long.parseLong(tempId);
@@ -46,7 +56,7 @@ public class PersonalMessageListServlet extends HttpServlet {
             request.setAttribute("editMessage", message);
             request.getRequestDispatcher("/WEB-INF/views/biz/edit_message.jsp").forward(request, response);
             return;
-        } else if (Objects.equals("/editMessage.do", pathName)) {
+        } else if (Objects.equals("/editMessage.do", pathName)) { //修改留言
             Long id = Long.valueOf(request.getParameter("id"));
             String title = request.getParameter("title");
             String content = request.getParameter("content");
@@ -60,9 +70,9 @@ public class PersonalMessageListServlet extends HttpServlet {
             User user = (User) request.getSession().getAttribute("user");
 
             Message message = new Message(id, user.getId(), user.getName(), title, content, createTime);
-            boolean result = messageService.UpdateMessage(message);
+            result = messageService.UpdateMessage(message);
             if (result) {
-                request.getRequestDispatcher("/my/message/list.do").forward(request,response);
+                request.getRequestDispatcher("/my/message/list.do").forward(request,response);  //成功返回到我的留言页面
                 return;
             }else{
                 request.getRequestDispatcher("/WEB-INF/views/biz/404.jsp").forward(request, response);
@@ -78,6 +88,7 @@ public class PersonalMessageListServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
+        //默认显示我的留言信息
         User user = (User) request.getSession().getAttribute("user");
         List<Message> personalMessages = messageService.getMessagesByUser(page, 5, user.getName());//分页查询登录用户全部留言
         int count = messageService.countUserMessage(user.getName());

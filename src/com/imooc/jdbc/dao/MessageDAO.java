@@ -154,8 +154,11 @@ public class MessageDAO {
         }
         return 0;
     }
-
-    public void deleteMessage(long id) {
+    /**
+     * 删除留言
+     * @return
+     */
+    public boolean deleteMessage(long id) {
         Connection conn = ConnectionUtil.getConnection();
         String sql = "delete from message where id = ?";
         PreparedStatement stmt = null;
@@ -167,12 +170,17 @@ public class MessageDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("删除失败");
+            return false;
         } finally {
             ConnectionUtil.release(rs, stmt, conn);
         }
-
+        return true;
     }
-
+    /**
+     * 通过留言id获得留言
+     * @return
+     */
     public Message getMessageById(long id) {
         Connection conn = ConnectionUtil.getConnection();
         String sql = "select * from message where id = ?";
@@ -201,7 +209,10 @@ public class MessageDAO {
         }
         return message;
     }
-
+    /**
+     * 修改留言
+     * @return
+     */
     public boolean updateMessage(Message message) {
         Connection conn = ConnectionUtil.getConnection();
         String sql = "UPDATE message SET user_id = ?, username = ?, title = ?, content = ?, create_time = ? WHERE id = ?";

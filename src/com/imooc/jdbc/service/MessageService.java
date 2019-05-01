@@ -58,15 +58,24 @@ public class MessageService {
     public int countUserMessage(String name) {
         return messageDAO.countUserMessage(name);
     }
-
-    public void deleteMessage(long id) {
-        messageDAO.deleteMessage(id);
+    /**
+     * 删除留言
+     * @return
+     */
+    public boolean deleteMessage(long id) {
+        return messageDAO.deleteMessage(id);
     }
-
+    /**
+     * 通过留言id获得留言
+     * @return
+     */
     public Message getMessageById(long id) {
         return messageDAO.getMessageById(id);
     }
-
+    /**
+     * 修改留言
+     * @return
+     */
     public boolean UpdateMessage(Message message) {
         return messageDAO.updateMessage(message);
     }
